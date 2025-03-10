@@ -14,7 +14,12 @@ import { FormSuccess } from "../form-messages/form-success";
 
 import {login} from "@/actions/login"
 
+import { useSearchParams } from "next/navigation";
+
 export function LoginForm(){
+    // manage params errors later
+    // const searchParams = useSearchParams();
+    // const urlError = searchParams.get("error")
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
@@ -34,8 +39,11 @@ export function LoginForm(){
         startTransition(()=>{
             login(values)
             .then((data)=>{
-               if(data.success) setSuccess(data.success);
-               else setError(data.error);
+               if(data){
+                setSuccess(data.success);
+                setError(data.error);
+               }
+            else{ return "there was a problem!"}
             })
         })
     }

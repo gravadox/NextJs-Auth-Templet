@@ -7,7 +7,12 @@ import type { NextAuthConfig } from "next-auth"
 import { getUserByEmail } from "@/actions/data/user"
 
 export default {
-     providers: [Credentials({
+     providers: [
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET
+        }),
+        Credentials({
         async authorize(credentials){
             const validatedFields = LoginSchema.safeParse(credentials);
             if(validatedFields){
