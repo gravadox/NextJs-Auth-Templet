@@ -19,6 +19,15 @@ export const { auth, handlers:{GET,POST}, signIn, signOut } = NextAuth({
                 }
             },
             callbacks: {
+                async signIn({user, account}){
+                    if(account?.provider !== "credentials") return true;
+                    if(user && user.id){
+                        const existingUser = await getUserById(user.id);
+                        if(!existingUser?.emailVerified) return false
+
+                    }
+                    return true;
+                },
                 async session({token, session}){
                     session.user.id
                     if(token.sub && session.user){

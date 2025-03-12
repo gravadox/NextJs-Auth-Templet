@@ -18,8 +18,10 @@ import { useSearchParams } from "next/navigation";
 
 export function LoginForm(){
     // manage params errors later
-    // const searchParams = useSearchParams();
-    // const urlError = searchParams.get("error")
+    const searchParams = useSearchParams();
+    const isUrlError = searchParams.get("error")
+    let urlError = ""
+    if(isUrlError){ urlError = isUrlError}
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
@@ -39,11 +41,9 @@ export function LoginForm(){
         startTransition(()=>{
             login(values)
             .then((data)=>{
-               if(data){
-                setSuccess(data.success);
-                setError(data.error);
-               }
-            else{ return "there was a problem!"}
+                setSuccess(data?.success);
+                setError(data?.error);
+               
             })
         })
     }
@@ -77,7 +77,7 @@ export function LoginForm(){
                     />
 
                 </div>
-                <FormError message={error}  />
+                <FormError message={error || urlError}  />
                 <FormSuccess message={success}  />
                 <Button type="submit" className="w-full">login</Button>
             </form>

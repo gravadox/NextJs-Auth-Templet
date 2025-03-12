@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs"
 import { RegisterSchema } from "@/schemas"
 import { db } from "@/lib/db"
 import { getUserByEmail } from "./data/user"
+import { generateVerificationToken } from "@/lib/tokens"
+import { sendVerificationEmail } from "@/lib/mail"
 
 
 export async function register(values:z.infer<typeof RegisterSchema>){
@@ -15,12 +17,12 @@ export async function register(values:z.infer<typeof RegisterSchema>){
     const { email, password, userName}:any = validatedValues.data
     
     const hashedPassword = await bcrypt.hash(password,10)
-    const existingUser = await getUserByEmail(email)
-
-    if(existingUser){
+    const existingUserEmail = await getUserByEmail(email)
+    // const existingUserUserName = await getUserByUserName(userName)
+    if(existingUserEmail){
         return {error : "This email is already existing"}
     }
-
+    // else if(existingUserUserName){ return {error: "This username is already existing"}}
     await db.user.create({
         data:{
             name: userName,
@@ -28,5 +30,8 @@ export async function register(values:z.infer<typeof RegisterSchema>){
             password: hashedPassword
         }
     })
-    return {sucess: "User created"}
+
+    const verficationToken = await generateVerificationToken(email)
+    await sendVerificationEmail(verficationToken.email, verficationToken.token)
+    return {sucess: "Verification email sent"}
 }

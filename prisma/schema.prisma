@@ -14,7 +14,7 @@ enum UserRole{
 
 model User {
   id            String    @id @default(cuid())
-  name          String?
+  name          String?   
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
@@ -42,4 +42,12 @@ model Account {
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
+}
+model verificationToken{
+  id      String @id @default(cuid())
+  email   String 
+  token   String @unique
+  expires DateTime
+
+  @@unique([email,token])
 }
