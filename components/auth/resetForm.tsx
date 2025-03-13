@@ -1,6 +1,6 @@
 "use client"
 import * as z from "zod"
-import { LoginSchema } from "@/schemas";
+import { ResetSchema } from "@/schemas";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,36 +11,28 @@ import { Button } from "@/components/ui/button";
 import { CardWrapper } from "./cardWrapper";
 import { FormError } from "../form-messages/form-error";
 import { FormSuccess } from "../form-messages/form-success";
-import Link from "next/link";
 
-import {login} from "@/actions/login"
+import { reset } from "@/actions/reset";
 
-import { useSearchParams } from "next/navigation";
 
-export function LoginForm(){
-    // manage params errors later
-    const searchParams = useSearchParams();
-    const isUrlError = searchParams.get("error")
-    let urlError = ""
-    if(isUrlError){ urlError = isUrlError}
+export function ResetForm(){
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
 
-    const form = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
+    const form = useForm<z.infer<typeof ResetSchema>>({
+        resolver: zodResolver(ResetSchema),
         defaultValues: {
             email: "",
-            password: ""
         }
     })
 
-    function onSubmit(values:z.infer<typeof LoginSchema>){
+    function onSubmit(values:z.infer<typeof ResetSchema>){
         setError("")
         setSuccess("")
         
         startTransition(()=>{
-            login(values)
+            reset(values)
             .then((data)=>{
                 setSuccess(data?.success);
                 setError(data?.error);
@@ -49,7 +41,7 @@ export function LoginForm(){
         })
     }
     return(
-        <CardWrapper headerLable="Welcom back" backButtonLable="Don't have an account?" backButtonHref="/auth/register" showSocials>
+        <CardWrapper headerLable="Forgot your password?" backButtonLable="Back to login?" backButtonHref="/auth/login">
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-4">
@@ -65,23 +57,11 @@ export function LoginForm(){
                     )}
                  />
 
-                    <FormField
-                                        control={form.control}
-                                        name="password"
-                                        render={({field})=>(
-                                            <FormItem>
-                                                <FormLabel>password</FormLabel>
-                                                <FormControl><Input {...field} placeholder="********" type="password" /></FormControl>
-                                                <Button size="sm" variant="link" asChild className="px-0 font-normal"><Link href="/auth/reset">forgot password?</Link></Button>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                    />
 
                 </div>
-                <FormError message={error || urlError}  />
+                <FormError message={error}  />
                 <FormSuccess message={success}  />
-                <Button type="submit" className="w-full">login</Button>
+                <Button type="submit" className="w-full">Send reset email</Button>
             </form>
         </Form>
         </CardWrapper>

@@ -20,7 +20,7 @@ export default auth((req)=>{
         return;
     }
     if(!isLoggedIn && !isPublicUrl){
-        return Response.redirect(new URL("/auth/login", nextUrl));
+        return Response.redirect(new URL("/", nextUrl));
     }
 
     return;
